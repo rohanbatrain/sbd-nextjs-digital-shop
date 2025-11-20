@@ -16,6 +16,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Search, Package, DollarSign, Users, TrendingUp, Edit, Trash2 } from 'lucide-react';
+import { CategoryManagementTab } from '@/components/admin/CategoryManagementTab';
 
 interface ShopItem {
     item_id: string;
@@ -270,14 +271,7 @@ export default function ShopAdminPage() {
                     </TabsContent>
 
                     <TabsContent value="categories" className="mt-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Category Management</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">Category management interface would go here</p>
-                            </CardContent>
-                        </Card>
+                        <CategoryManagementTab />
                     </TabsContent>
 
                     <TabsContent value="sales" className="mt-6">

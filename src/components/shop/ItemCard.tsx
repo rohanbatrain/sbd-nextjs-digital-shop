@@ -3,15 +3,38 @@ import { ShopItem } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Coins, ShoppingCart } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Coins, ShoppingCart, Eye } from 'lucide-react';
 
 interface ItemCardProps {
     item: ShopItem;
+    onQuickView?: (item: ShopItem) => void;
+    comparisonMode?: boolean;
+    isComparing?: boolean;
+    onCompareToggle?: (item: ShopItem, checked: boolean) => void;
 }
 
-export function ItemCard({ item }: ItemCardProps) {
+export function ItemCard({
+    item,
+    onQuickView,
+    comparisonMode = false,
+    isComparing = false,
+    onCompareToggle
+}: ItemCardProps) {
     return (
-        <Card className="flex flex-col h-full hover:shadow-lg transition-shadow group">
+        <Card className="flex flex-col h-full hover:shadow-lg transition-shadow group relative">
+            {/* Comparison Checkbox */}
+            {comparisonMode && onCompareToggle && (
+                <div className="absolute top-3 left-3 z-10">
+                    <Checkbox
+                        checked={isComparing}
+                        onCheckedChange={(checked) => onCompareToggle(item, checked as boolean)}
+                        className="bg-background shadow-md"
+                        aria-label={`Compare ${item.name}`}
+                    />
+                </div>
+            )}
+
             <div className="h-48 w-full overflow-hidden rounded-t-xl bg-muted relative">
                 {item.image_url ? (
                     <img
@@ -28,6 +51,22 @@ export function ItemCard({ item }: ItemCardProps) {
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                         <Badge variant="destructive">Out of Stock</Badge>
                     </div>
+                )}
+
+                {/* Quick View Button */}
+                {onQuickView && (
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onQuickView(item);
+                        }}
+                    >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Quick View
+                    </Button>
                 )}
             </div>
 

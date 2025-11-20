@@ -40,3 +40,26 @@ export interface UserBalance {
     balance: number;
     currency: string;
 }
+
+export type SortOption =
+    | 'price_asc'
+    | 'price_desc'
+    | 'newest'
+    | 'popular'
+    | 'name_asc'
+    | 'name_desc';
+
+export interface FilterOptions {
+    priceRange?: {
+        min: number;
+        max: number;
+    };
+    availability?: 'all' | 'in_stock' | 'out_of_stock';
+    rating?: number;
+    categories?: string[];
+}
+
+export interface ComparisonItem {
+    item: ShopItem;
+    selected: boolean;
+}

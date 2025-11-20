@@ -26,7 +26,14 @@ export const endpoints = {
     // All endpoints are now available and fully functional
     shop: {
         items: '/shop/items',                    // ✅ Browse shop items with filters
-        categories: '/shop/categories',          // ✅ Get shop categories
+        categories: {
+            list: '/shop/categories',            // ✅ Get all categories
+            create: '/shop/categories',          // ✅ Create category
+            update: (id: string) => `/shop/categories/${id}`, // ✅ Update category
+            delete: (id: string) => `/shop/categories/${id}`, // ✅ Delete category
+            detail: (id: string) => `/shop/categories/${id}`, // ✅ Get category detail
+            items: (id: string) => `/shop/categories/${id}/items`, // ✅ Get category items
+        },
         item: (id: string, type: string) => `/shop/items/${id}?item_type=${type}`, // ✅ Get item details
         purchase: '/shop/purchase',              // ✅ Direct purchase (legacy)
     },

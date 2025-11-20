@@ -1,13 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ShopItem, ShopCategory } from '@/types';
+import { useState, useEffect, useMemo } from 'react';
+import { ShopItem, ShopCategory, SortOption, FilterOptions } from '@/types';
 import { ItemCard } from '@/components/shop/ItemCard';
+import { ItemQuickView } from '@/components/shop/ItemQuickView';
+import { AdvancedFilters } from '@/components/shop/AdvancedFilters';
+import { ItemComparison } from '@/components/shop/ItemComparison';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Search, GitCompare, SlidersHorizontal } from 'lucide-react';
 
 export default function ShopPage() {
     const [items, setItems] = useState<ShopItem[]>([]);
@@ -15,6 +25,15 @@ export default function ShopPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [sortOption, setSortOption] = useState<SortOption>('name_asc');
+    const [filters, setFilters] = useState<FilterOptions>({
+        priceRange: { min: 0, max: 1000 },
+        availability: 'all',
+    });
+    const [quickViewItem, setQuickViewItem] = useState<ShopItem | null>(null);
+    const [comparisonMode, setComparisonMode] = useState(false);
+    const [comparisonItems, setComparisonItems] = useState<ShopItem[]>([]);
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -100,12 +119,71 @@ export default function ShopPage() {
         fetchData();
     }, []);
 
-    const filteredItems = items.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
-            item.description.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = selectedCategory ? item.category === selectedCategory : true;
-        return matchesSearch && matchesCategory;
-    });
+    // Calculate max price for filters
+    const maxPrice = useMemo(() => {
+        return Math.max(...items.map(item => item.price), 1000);
+    }, [items]);
+
+    // Filter and sort items
+    const filteredAndSortedItems = useMemo(() => {
+        let result = items.filter(item => {
+            const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
+                item.description.toLowerCase().includes(search.toLowerCase());
+            const matchesCategory = selectedCategory ? item.category === selectedCategory : true;
+            const matchesPrice =
+                item.price >= (filters.priceRange?.min ?? 0) &&
+                item.price <= (filters.priceRange?.max ?? maxPrice);
+            const matchesAvailability =
+                filters.availability === 'all' ? true :
+                    filters.availability === 'in_stock' ? item.is_available :
+                        !item.is_available;
+
+            return matchesSearch && matchesCategory && matchesPrice && matchesAvailability;
+        });
+
+        // Sort items
+        result.sort((a, b) => {
+            switch (sortOption) {
+                case 'price_asc':
+                    return a.price - b.price;
+                case 'price_desc':
+                    return b.price - a.price;
+                case 'name_asc':
+                    return a.name.localeCompare(b.name);
+                case 'name_desc':
+                    return b.name.localeCompare(a.name);
+                case 'newest':
+                    // For now, maintain original order (newest first)
+                    return 0;
+                case 'popular':
+                    // For now, maintain original order
+                    return 0;
+                default:
+                    return 0;
+            }
+        });
+
+        return result;
+    }, [items, search, selectedCategory, filters, sortOption, maxPrice]);
+
+    const handleCompareToggle = (item: ShopItem, checked: boolean) => {
+        if (checked) {
+            if (comparisonItems.length < 4) {
+                setComparisonItems([...comparisonItems, item]);
+            }
+        } else {
+            setComparisonItems(comparisonItems.filter(i => i.item_id !== item.item_id));
+        }
+    };
+
+    const handleRemoveFromComparison = (itemId: string) => {
+        setComparisonItems(comparisonItems.filter(i => i.item_id !== itemId));
+    };
+
+    const handleClearComparison = () => {
+        setComparisonItems([]);
+        setComparisonMode(false);
+    };
 
     if (loading) {
         return (
@@ -123,6 +201,7 @@ export default function ShopPage() {
     return (
         <div className="min-h-screen bg-background">
             <div className="container py-10">
+                {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl font-bold">Digital Shop</h1>
@@ -139,6 +218,46 @@ export default function ShopPage() {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
+                </div>
+
+                {/* Toolbar */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                    <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Sort by" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="name_asc">Name (A-Z)</SelectItem>
+                            <SelectItem value="name_desc">Name (Z-A)</SelectItem>
+                            <SelectItem value="price_asc">Price (Low to High)</SelectItem>
+                            <SelectItem value="price_desc">Price (High to Low)</SelectItem>
+                            <SelectItem value="newest">Newest First</SelectItem>
+                            <SelectItem value="popular">Most Popular</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Button
+                        variant={comparisonMode ? "default" : "outline"}
+                        onClick={() => setComparisonMode(!comparisonMode)}
+                        className="gap-2"
+                    >
+                        <GitCompare className="h-4 w-4" />
+                        {comparisonMode ? 'Exit Compare' : 'Compare Items'}
+                        {comparisonItems.length > 0 && (
+                            <Badge variant="secondary" className="ml-1">
+                                {comparisonItems.length}
+                            </Badge>
+                        )}
+                    </Button>
+
+                    <Button
+                        variant="outline"
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="gap-2 md:hidden"
+                    >
+                        <SlidersHorizontal className="h-4 w-4" />
+                        Filters
+                    </Button>
                 </div>
 
                 {/* Category Filter */}
@@ -162,20 +281,57 @@ export default function ShopPage() {
                     ))}
                 </div>
 
-                {/* Items Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredItems.map(item => (
-                        <ItemCard key={item.item_id} item={item} />
-                    ))}
-                </div>
-
-                {filteredItems.length === 0 && (
-                    <div className="text-center py-20">
-                        <h3 className="text-lg font-semibold">No items found</h3>
-                        <p className="text-muted-foreground">Try adjusting your search or filters.</p>
+                {/* Main Content */}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Filters Sidebar */}
+                    <div className={`lg:block ${showFilters ? 'block' : 'hidden'}`}>
+                        <AdvancedFilters
+                            filters={filters}
+                            onFiltersChange={setFilters}
+                            maxPrice={maxPrice}
+                        />
                     </div>
-                )}
+
+                    {/* Items Grid */}
+                    <div className="lg:col-span-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {filteredAndSortedItems.map(item => (
+                                <ItemCard
+                                    key={item.item_id}
+                                    item={item}
+                                    onQuickView={setQuickViewItem}
+                                    comparisonMode={comparisonMode}
+                                    isComparing={comparisonItems.some(i => i.item_id === item.item_id)}
+                                    onCompareToggle={handleCompareToggle}
+                                />
+                            ))}
+                        </div>
+
+                        {filteredAndSortedItems.length === 0 && (
+                            <div className="text-center py-20">
+                                <h3 className="text-lg font-semibold">No items found</h3>
+                                <p className="text-muted-foreground">Try adjusting your search or filters.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
+
+            {/* Quick View Modal */}
+            <ItemQuickView
+                item={quickViewItem}
+                open={!!quickViewItem}
+                onOpenChange={(open) => !open && setQuickViewItem(null)}
+            />
+
+            {/* Comparison Panel */}
+            {comparisonItems.length > 0 && (
+                <ItemComparison
+                    items={comparisonItems}
+                    onRemoveItem={handleRemoveFromComparison}
+                    onClearAll={handleClearComparison}
+                />
+            )}
         </div>
     );
 }
