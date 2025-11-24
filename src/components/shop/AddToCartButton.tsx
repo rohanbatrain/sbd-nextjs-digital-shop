@@ -11,6 +11,8 @@ interface AddToCartButtonProps {
         item_type: string;
         name: string;
         price: number;
+        price_sbd?: number;
+        price_inr?: number;
         image_url?: string;
     };
 }

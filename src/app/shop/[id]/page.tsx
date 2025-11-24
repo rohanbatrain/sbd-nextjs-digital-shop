@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { ShopItem } from '@/types';
+import { formatSBDTokens, formatINR } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +28,9 @@ export default function ItemDetailPage() {
                     name: 'Premium Dark Theme',
                     description: 'A beautiful dark theme with customizable colors and modern design. Perfect for creating stunning user interfaces with a professional look. Includes multiple color schemes, responsive layouts, and accessibility features.',
                     category: 'Themes',
-                    price: 500,
+                    price: 29000000,
+                    price_sbd: 29000000,
+                    price_inr: 29,
                     image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200',
                     stock: 100,
                     is_available: true,
@@ -104,9 +107,16 @@ export default function ItemDetailPage() {
                             <h1 className="text-4xl font-bold tracking-tight mb-4">
                                 {item.name}
                             </h1>
-                            <div className="flex items-center gap-2 text-3xl font-bold text-primary">
-                                <Coins className="h-8 w-8" />
-                                <span>{item.price.toLocaleString()} SBD</span>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2 text-3xl font-bold text-primary">
+                                    <Coins className="h-8 w-8" />
+                                    <span>{formatSBDTokens(item.price_sbd ?? item.price)}</span>
+                                </div>
+                                {item.price_inr && (
+                                    <span className="text-lg text-muted-foreground ml-10">
+                                        ({formatINR(item.price_inr)})
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -169,9 +179,16 @@ export default function ItemDetailPage() {
                             <Card className="bg-muted/50">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <span className="font-medium">Total:</span>
-                                    <div className="flex items-center gap-2 text-2xl font-bold text-primary">
-                                        <Coins className="h-6 w-6" />
-                                        <span>{totalPrice.toLocaleString()} SBD</span>
+                                    <div className="flex flex-col items-end">
+                                        <div className="flex items-center gap-2 text-2xl font-bold text-primary">
+                                            <Coins className="h-6 w-6" />
+                                            <span>{formatSBDTokens((item.price_sbd ?? item.price) * quantity)}</span>
+                                        </div>
+                                        {item.price_inr && (
+                                            <span className="text-sm text-muted-foreground">
+                                                ({formatINR(item.price_inr * quantity)})
+                                            </span>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>

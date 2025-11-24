@@ -5,7 +5,9 @@ interface CartItem {
     item_id: string;
     item_type: string;
     name: string;
-    price: number;
+    price: number; // Deprecated: Use price_sbd
+    price_sbd?: number;
+    price_inr?: number;
     quantity: number;
     image_url?: string;
 }
@@ -60,7 +62,10 @@ export const useCartStore = create<CartStore>()(
             },
 
             getTotalPrice: () => {
-                return get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+                return get().items.reduce((total, item) => {
+                    const price = item.price_sbd ?? item.price;
+                    return total + (price * item.quantity);
+                }, 0);
             },
         }),
         {

@@ -27,7 +27,7 @@ export default function ShopPage() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [sortOption, setSortOption] = useState<SortOption>('name_asc');
     const [filters, setFilters] = useState<FilterOptions>({
-        priceRange: { min: 0, max: 1000 },
+        priceRange: { min: 0, max: 150000000 },
         availability: 'all',
     });
     const [quickViewItem, setQuickViewItem] = useState<ShopItem | null>(null);
@@ -53,7 +53,9 @@ export default function ShopPage() {
                         name: 'Premium Dark Theme',
                         description: 'A beautiful dark theme with customizable colors and modern design.',
                         category: 'Themes',
-                        price: 500,
+                        price: 29000000,
+                        price_sbd: 29000000,
+                        price_inr: 29,
                         image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800',
                         stock: 100,
                         is_available: true
@@ -63,7 +65,9 @@ export default function ShopPage() {
                         name: 'Lucide Icon Pack Pro',
                         description: 'Extended icon pack with 2000+ premium icons for your projects.',
                         category: 'Icons',
-                        price: 300,
+                        price: 19000000,
+                        price_sbd: 19000000,
+                        price_inr: 19,
                         image_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
                         stock: 50,
                         is_available: true
@@ -73,7 +77,9 @@ export default function ShopPage() {
                         name: 'Dashboard Template',
                         description: 'Complete admin dashboard template with charts and analytics.',
                         category: 'Templates',
-                        price: 750,
+                        price: 49000000,
+                        price_sbd: 49000000,
+                        price_inr: 49,
                         image_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800',
                         stock: 8,
                         is_available: true
@@ -83,7 +89,9 @@ export default function ShopPage() {
                         name: 'AI Chat Plugin',
                         description: 'Integrate AI-powered chat into your application.',
                         category: 'Plugins',
-                        price: 1000,
+                        price: 99000000,
+                        price_sbd: 99000000,
+                        price_inr: 99,
                         image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
                         stock: 25,
                         is_available: true
@@ -93,7 +101,9 @@ export default function ShopPage() {
                         name: 'Minimalist UI Kit',
                         description: 'Clean and minimal UI components for modern applications.',
                         category: 'Themes',
-                        price: 400,
+                        price: 29000000,
+                        price_sbd: 29000000,
+                        price_inr: 29,
                         image_url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800',
                         stock: 0,
                         is_available: false
@@ -103,7 +113,9 @@ export default function ShopPage() {
                         name: 'Landing Page Bundle',
                         description: '10 stunning landing page templates for various industries.',
                         category: 'Templates',
-                        price: 900,
+                        price: 129000000,
+                        price_sbd: 129000000,
+                        price_inr: 129,
                         image_url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
                         stock: 15,
                         is_available: true
@@ -121,7 +133,7 @@ export default function ShopPage() {
 
     // Calculate max price for filters
     const maxPrice = useMemo(() => {
-        return Math.max(...items.map(item => item.price), 1000);
+        return Math.max(...items.map(item => item.price), 150000000);
     }, [items]);
 
     // Filter and sort items

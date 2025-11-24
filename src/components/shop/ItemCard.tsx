@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ShopItem } from '@/types';
+import { cn, formatSBDTokens, formatINR } from '@/lib/utils';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -88,9 +89,16 @@ export function ItemCard({
             </CardHeader>
 
             <CardFooter className="flex items-center justify-between pt-4 border-t">
-                <div className="flex items-center gap-1.5 text-primary font-bold text-lg">
-                    <Coins className="h-5 w-5" />
-                    <span>{item.price.toLocaleString()} SBD</span>
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-1.5 text-primary font-bold text-lg">
+                        <Coins className="h-5 w-5" />
+                        <span>{formatSBDTokens(item.price_sbd ?? item.price)}</span>
+                    </div>
+                    {item.price_inr && (
+                        <span className="text-xs text-muted-foreground ml-6">
+                            ({formatINR(item.price_inr)})
+                        </span>
+                    )}
                 </div>
                 <Link href={`/shop/${item.item_id}`}>
                     <Button size="sm" disabled={!item.is_available}>

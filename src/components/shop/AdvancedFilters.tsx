@@ -1,6 +1,7 @@
 'use client';
 
 import { FilterOptions } from '@/types';
+import { formatSBDTokens } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -75,7 +76,7 @@ export function AdvancedFilters({ filters, onFiltersChange, maxPrice }: Advanced
                         <Slider
                             min={0}
                             max={maxPrice}
-                            step={50}
+                            step={1000000} // 1M SBD step
                             value={[
                                 filters.priceRange?.min ?? 0,
                                 filters.priceRange?.max ?? maxPrice,
@@ -85,8 +86,8 @@ export function AdvancedFilters({ filters, onFiltersChange, maxPrice }: Advanced
                         />
                     </div>
                     <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{filters.priceRange?.min ?? 0} SBD</span>
-                        <span>{filters.priceRange?.max ?? maxPrice} SBD</span>
+                        <span>{formatSBDTokens(filters.priceRange?.min ?? 0, false)}</span>
+                        <span>{formatSBDTokens(filters.priceRange?.max ?? maxPrice, false)}</span>
                     </div>
                 </div>
 

@@ -3,7 +3,9 @@ export interface ShopItem {
     name: string;
     description: string;
     category: string;
-    price: number;
+    price: number; // Deprecated: Use price_sbd
+    price_sbd?: number;
+    price_inr?: number;
     image_url?: string;
     stock: number;
     is_available: boolean;

@@ -1,6 +1,7 @@
 'use client';
 
 import { ShopItem } from '@/types';
+import { formatSBDTokens, formatINR } from '@/lib/utils';
 import {
     Dialog,
     DialogContent,
@@ -68,9 +69,16 @@ export function ItemQuickView({ item, open, onOpenChange }: ItemQuickViewProps) 
 
                         <p className="text-muted-foreground">{item.description}</p>
 
-                        <div className="flex items-center gap-2 text-primary font-bold text-2xl mt-auto">
-                            <Coins className="h-6 w-6" />
-                            <span>{item.price.toLocaleString()} SBD</span>
+                        <div className="flex flex-col mt-auto">
+                            <div className="flex items-center gap-2 text-primary font-bold text-2xl">
+                                <Coins className="h-6 w-6" />
+                                <span>{formatSBDTokens(item.price_sbd ?? item.price)}</span>
+                            </div>
+                            {item.price_inr && (
+                                <span className="text-sm text-muted-foreground ml-8">
+                                    ({formatINR(item.price_inr)})
+                                </span>
+                            )}
                         </div>
 
                         <div className="flex gap-2">
@@ -80,6 +88,8 @@ export function ItemQuickView({ item, open, onOpenChange }: ItemQuickViewProps) 
                                     item_type: 'shop_item',
                                     name: item.name,
                                     price: item.price,
+                                    price_sbd: item.price_sbd,
+                                    price_inr: item.price_inr,
                                     image_url: item.image_url
                                 }}
                             />

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
+import { formatSBDTokens, formatINR } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -81,9 +82,16 @@ export default function CartPage() {
 
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-lg">{item.name}</h3>
-                                            <div className="flex items-center gap-2 mt-2 text-primary font-bold">
-                                                <Coins className="h-4 w-4" />
-                                                <span>{item.price.toLocaleString()} SBD</span>
+                                            <div className="flex flex-col mt-2">
+                                                <div className="flex items-center gap-2 text-primary font-bold">
+                                                    <Coins className="h-4 w-4" />
+                                                    <span>{formatSBDTokens(item.price_sbd ?? item.price)}</span>
+                                                </div>
+                                                {item.price_inr && (
+                                                    <span className="text-xs text-muted-foreground ml-6">
+                                                        ({formatINR(item.price_inr)})
+                                                    </span>
+                                                )}
                                             </div>
 
                                             <div className="flex items-center gap-4 mt-4">
@@ -121,9 +129,16 @@ export default function CartPage() {
 
                                         <div className="text-right">
                                             <p className="text-sm text-muted-foreground">Subtotal</p>
-                                            <div className="flex items-center gap-1 text-lg font-bold text-primary">
-                                                <Coins className="h-5 w-5" />
-                                                <span>{(item.price * item.quantity).toLocaleString()} SBD</span>
+                                            <div className="flex flex-col items-end">
+                                                <div className="flex items-center gap-1 text-lg font-bold text-primary">
+                                                    <Coins className="h-5 w-5" />
+                                                    <span>{formatSBDTokens((item.price_sbd ?? item.price) * item.quantity)}</span>
+                                                </div>
+                                                {item.price_inr && (
+                                                    <span className="text-xs text-muted-foreground">
+                                                        ({formatINR(item.price_inr * item.quantity)})
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -142,7 +157,7 @@ export default function CartPage() {
                                     <span className="text-muted-foreground">Items ({items.length})</span>
                                     <div className="flex items-center gap-1 font-medium">
                                         <Coins className="h-4 w-4 text-primary" />
-                                        <span>{totalPrice.toLocaleString()} SBD</span>
+                                        <span>{formatSBDTokens(totalPrice)}</span>
                                     </div>
                                 </div>
 
@@ -152,7 +167,7 @@ export default function CartPage() {
                                     <span>Total</span>
                                     <div className="flex items-center gap-1 text-primary">
                                         <Coins className="h-5 w-5" />
-                                        <span>{totalPrice.toLocaleString()} SBD</span>
+                                        <span>{formatSBDTokens(totalPrice)}</span>
                                     </div>
                                 </div>
                             </CardContent>

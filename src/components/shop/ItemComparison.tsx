@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ShopItem } from '@/types';
+import { formatSBDTokens, formatINR } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -113,9 +114,16 @@ export function ItemComparison({ items, onRemoveItem, onClearAll }: ItemComparis
                                         {items.map((item) => (
                                             <div key={item.item_id} className="text-sm">
                                                 {attr.key === 'price' ? (
-                                                    <div className="flex items-center gap-1 text-primary font-semibold">
-                                                        <Coins className="h-4 w-4" />
-                                                        {item.price.toLocaleString()} SBD
+                                                    <div className="flex flex-col">
+                                                        <div className="flex items-center gap-1 text-primary font-semibold">
+                                                            <Coins className="h-4 w-4" />
+                                                            {formatSBDTokens(item.price_sbd ?? item.price)}
+                                                        </div>
+                                                        {item.price_inr && (
+                                                            <span className="text-xs text-muted-foreground ml-5">
+                                                                ({formatINR(item.price_inr)})
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 ) : attr.key === 'is_available' ? (
                                                     <Badge variant={item.is_available ? 'default' : 'destructive'}>
